@@ -8,7 +8,7 @@ function PHParse(str) {
     result[k] = v;
   }
   return result;
-};
+}
 var __PHParseValue = function(o) {
   var v, type = o.str[o.pos].toLowerCase(), len, idelim;
   o.pos += 2;
@@ -38,12 +38,8 @@ var __PHParseValue = function(o) {
     idelim = o.str.indexOf(':', o.pos);
     len = parseInt(o.str.substring(o.pos, idelim), 10);
     o.pos = idelim + 2;
-    for (var i=0,key,val; i<len; ++i) {
+    for (var i=0; i<len; ++i)
       v[__PHParseValue(o)] = __PHParseValue(o);
-      /*key = __PHParseValue(o);
-      val = __PHParseValue(o);
-      v[key] = val;*/
-    }
     ++o.pos;
   } else if (type === 'r') {
     // TODO: support for recursion/references
