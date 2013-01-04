@@ -1,13 +1,18 @@
 function PHParse(str) {
-  var result = {}, o = { str: str, pos: 0 };
-  for (var k,v,i,last=o.str.length; o.pos<last;) {
-    i = o.str.indexOf('|', o.pos);
-    k = o.str.substring(o.pos, i);
-    o.pos = i + 1;
-    v = __PHParseValue(o);
-    result[k] = v;
+  var o = { str: str, pos: 0 };
+  if (str.indexOf('|') === -1)
+    return __PHParseValue(o);
+  else {
+    var result = {};
+    for (var k , v, i, last = o.str.length; o.pos < last;) {
+      i = o.str.indexOf('|', o.pos);
+      k = o.str.substring(o.pos, i);
+      o.pos = i + 1;
+      v = __PHParseValue(o);
+      result[k] = v;
+    }
+    return result;
   }
-  return result;
 }
 var __PHParseValue = function(o) {
   var v, type = o.str[o.pos].toLowerCase(), len, idelim;
@@ -38,8 +43,18 @@ var __PHParseValue = function(o) {
     idelim = o.str.indexOf(':', o.pos);
     len = parseInt(o.str.substring(o.pos, idelim), 10);
     o.pos = idelim + 2;
-    for (var i=0; i<len; ++i)
-      v[__PHParseValue(o)] = __PHParseValue(o);
+    var isArray = true;
+    for (var i = 0, key; i < len; ++i) {
+      key = __PHParseValue(o);
+      v[key] = __PHParseValue(o);
+      if (typeof key !== 'number' && isArray)
+        isArray = false;
+    }
+    if (type === 'a' && isArray) {
+      // make "arrays" with no/(only numeric) keys, javascript arrays
+      v.length = Object.keys(v).length;
+      v = Array.prototype.slice.call(v);
+    }
     ++o.pos;
   } else if (type === 'r') {
     // TODO: support for recursion/references

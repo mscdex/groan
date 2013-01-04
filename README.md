@@ -10,8 +10,8 @@ Requirements
 * JavaScript (compatible with [node.js](http://nodejs.org/))
 
 
-Node.JS Example
-===============
+Node.JS Examples
+================
 
 ```javascript
 var fs = require('fs'),
@@ -29,6 +29,8 @@ fs.readFile('/tmp/sess_1234567890abcdef', function(err, b) {
   console.dir(parser(b.toString('utf8')));
   /*
      for a $_SESSION that contains:
+        ["0"]=>
+        string(3) "foo"
         ["a"]=>
         string(5) "apple"
         ["b"]=>
@@ -48,17 +50,24 @@ fs.readFile('/tmp/sess_1234567890abcdef', function(err, b) {
 
     the parser will return an object that looks like:
       {
+        0: 'foo',
         a: 'apple',
         b: false,
-        c: {
-          0: 17,
-          1: 1.5,
-          2: 'x'
-        },
-        d: {}
+        c: [ 17, 1.5, 'x' ],
+        d: []
       }
   */
 });
+```
+
+```javascript
+var parser = require('groan');
+
+var serialized = 'a:5:{i:0;s:3:"foo";s:1:"a";s:5:"apple";s:1:"b";b:0;s:1:"c";a:3:{i:0;i:17;i:1;d:1.5;i:2;s:1:"x";}s:1:"d";a:0:{}}';
+console.dir(parser(serialized));
+
+// output:
+// { '0': 'foo', a: 'apple', b: false, c: [ 17, 1.5, 'x' ], d: [] }
 ```
 
 
