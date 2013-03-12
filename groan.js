@@ -62,6 +62,22 @@ var __PHParseValue = function(o) {
     v = undefined;
   } else if (type === 'n')
     v = null;
+  else if (type === 'c') {
+    v = {};
+
+    idelim = o.str.indexOf(':', o.pos);
+    len = parseInt(o.str.substring(o.pos, idelim), 10);
+    o.pos = idelim + 2;
+    //var clsName = o.str.substring(o.pos, o.pos + len);
+    o.pos += len + 2;
+
+    idelim = o.str.indexOf(':', o.pos);
+    len = parseInt(o.str.substring(o.pos, idelim), 10);
+    o.pos = idelim + 2;
+    //v[clsName] = o.str.substring(o.pos, o.pos + len);
+    v = o.str.substring(o.pos, o.pos + len);
+    o.pos += len + 1;
+  }
   return v;
 };
 var __PHParseString = function(o) {
