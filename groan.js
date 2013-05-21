@@ -21,7 +21,8 @@ var __PHParseValue = function(o) {
     idelim = o.str.indexOf(':', o.pos);
     len = parseInt(o.str.substring(o.pos, idelim), 10);
     o.pos = idelim + 2;
-    v = __PHParseString(o);
+    v = o.str.substr(o.pos, len);
+    o.pos += len + 2;
   } else if (type === 'i') {
     idelim = o.str.indexOf(';', o.pos);
     v = parseInt(o.str.substring(o.pos, idelim), 10);
@@ -37,8 +38,9 @@ var __PHParseValue = function(o) {
     v = {};
     if (type === 'o') {
       // skip object class name
-      o.pos = o.str.indexOf(':', o.pos) + 2;
-      __PHParseString(o);
+      idelim = o.str.indexOf(':', o.pos);
+      len = parseInt(o.str.substring(o.pos, idelim), 10);
+      o.pos = idelim + 2 + len + 2;
     }
     idelim = o.str.indexOf(':', o.pos);
     len = parseInt(o.str.substring(o.pos, idelim), 10);
@@ -79,19 +81,6 @@ var __PHParseValue = function(o) {
     o.pos += len + 1;
   }
   return v;
-};
-var __PHParseString = function(o) {
-  var s = "", orig = o.pos, escaped = false;
-  while (true) {
-    if (o.str[o.pos] === '"' && !escaped) {
-      s = o.str.substring(orig, o.pos);
-      break;
-    } else if (o.str[o.pos] === '\\')
-      escaped = !escaped;
-    ++o.pos;
-  }
-  o.pos += 2;
-  return s;
 };
 
 if (module)
