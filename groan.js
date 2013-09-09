@@ -21,6 +21,23 @@ var __PHParseValue = function(o) {
     idelim = o.str.indexOf(':', o.pos);
     len = parseInt(o.str.substring(o.pos, idelim), 10);
     o.pos = idelim + 2;
+    for (var i = 0, cc; i < len; ++i) {
+      cc = fixedCharCodeAt(o.str, o.pos + i);
+      if (typeof cc === 'number') {
+        if (cc < 128)
+          ;
+        else if (cc < 2048)
+          len -= 1;
+        else if (cc < 65536)
+          len -= 2;
+        else if (cc < 2097152)
+          len -= 3;
+        else if (cc < 67108864)
+          len -= 4;
+        else
+          len -= 5;
+      }
+    }
     v = o.str.substr(o.pos, len);
     o.pos += len + 2;
   } else if (type === 'i') {
@@ -87,3 +104,28 @@ if (module)
   module.exports = PHParse;
 else if (window)
   window.PHParse = PHParse;
+
+// fixedCharCodeAt by Frank Neff, licensed GPLv2
+// original source: https://gist.github.com/frne/1358348
+function fixedCharCodeAt(str, idx) {
+  idx = idx || 0;
+  var code = str.charCodeAt(idx), hi, low;
+  if (0xD800 <= code && code <= 0xDBFF) {
+    // High surrogate (could change last
+    // hex to 0xDB7F to treat high private
+    // surrogates as single characters)
+    hi = code;
+    low = str.charCodeAt(idx + 1);
+    return ((hi - 0xD800) * 0x400) + (low - 0xDC00) + 0x10000;
+  }
+  if (0xDC00 <= code && code <= 0xDFFF) {
+    // Low surrogate
+    // We return false to allow loops to skip this iteration since should have
+    // already handled high surrogate above in the previous iteration
+    return false;
+    /*hi = str.charCodeAt(idx-1);
+     low = code;
+     return ((hi - 0xD800) * 0x400) + (low - 0xDC00) + 0x10000;*/
+  }
+  return code;
+}
